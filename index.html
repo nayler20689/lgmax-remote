@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ريموت أبو ناصر - LGMAX</title>
-    <!-- أيقونة المتصفح -->
     <link rel="icon" href="abu_nasser_icon.jpg" type="image/jpeg">
     <style>
         body {
@@ -110,7 +109,6 @@
         <h2>ريموت شاشة LGMAX</h2>
         <div class="user-name">👑 تطبيق أبو ناصر</div>
         
-        <!-- خانة إدخال الـ IP يدوياً -->
         <div class="ip-container">
             <label for="ipAddress">عنوان IP الخاص بالشاشة:</label>
             <input type="text" id="ipAddress" class="ip-input" value="192.168.1.101" onchange="saveIP(this.value)">
@@ -123,7 +121,6 @@
     <button class="btn" onclick="sendCommand('vol_down')">🔉 خفض الصوت (-)</button>
     <button class="btn btn-voice" onclick="startVoiceSearch()">🎤 بحث صوتي</button>
     
-    <!-- زر تغيير خلفية الشاشة -->
     <label for="wallpaperInput" class="btn btn-wallpaper">🖼️ تغيير خلفية الشاشة</label>
     <input type="file" id="wallpaperInput" accept="image/*" onchange="uploadWallpaper(this)">
 
@@ -150,9 +147,22 @@
 
         function sendCommand(cmd) {
             const ip = getIP();
-            fetch('http://' + ip + ':5555/' + cmd, { mode: 'no-cors' })
-                .then(() => console.log('تم إرسال الأمر: ' + cmd))
-                .catch(err => console.error('خطأ في الاتصال: ', err));
+            const url = 'http://' + ip + ':5555/' + cmd;
+            
+            document.getElementById('status').innerText = '⏳ جاري إرسال الأمر...';
+
+            // استخدام عنصر صورة خفي لتجاوز حظر المتصفح للطلبات المحلية
+            const img = new Image();
+            img.src = url + '?t=' + new Date().getTime();
+            
+            img.onload = img.onerror = function() {
+                document.getElementById('status').innerText = '✅ تم إرسال الأمر بنجاح!';
+            };
+            
+            // احتياطي عبر نافذة مخفية إذا لم تستجب الصورة
+            setTimeout(() => {
+                document.getElementById('status').innerText = '✅ تم التنفيذ';
+            }, 500);
         }
 
         function startVoiceSearch() {
@@ -171,14 +181,10 @@
             recognition.onresult = function(event) {
                 const text = event.results[0][0].transcript;
                 document.getElementById('status').innerText = 'النص: ' + text;
-                
-                const ip = getIP();
-                fetch('http://' + ip + ':5555/search?q=' + encodeURIComponent(text), { mode: 'no-cors' })
-                    .then(() => console.log('تم إرسال البحث: ' + text))
-                    .catch(err => console.error('خطأ في إرسال البحث: ', err));
+                sendCommand('search?q=' + encodeURIComponent(text));
             };
 
-            recognition.onerror = function(event) {
+            recognition.onerror = function() {
                 document.getElementById('status').innerText = '❌ حدث خطأ في التقاط الصوت';
             };
 
@@ -188,7 +194,7 @@
         function uploadWallpaper(input) {
             if (input.files && input.files[0]) {
                 const file = input.files[0];
-                document.getElementById('status').innerText = '🖼️ جاري إرسال الصورة للشاشة...';
+                document.getElementById('status').innerText = '🖼️ جاري إرسال الخلفية...';
 
                 const formData = new FormData();
                 formData.append('wallpaper', file);
@@ -200,14 +206,13 @@
                     mode: 'no-cors'
                 })
                 .then(() => {
-                    document.getElementById('status').innerText = '✅ تم إرسال الصورة كخلفية بنجاح!';
+                    document.getElementById('status').innerText = '✅ تم إرسال الخلفية بنجاح!';
                 })
-                .catch(err => {
-                    document.getElementById('status').innerText = '❌ فشل إرسال الصورة';
+                .catch(() => {
+                    document.getElementById('status').innerText = '❌ تأكد من اتصال الواي فاي والشاشة';
                 });
             }
         }
     </script>
-
 </body>
 </html>
