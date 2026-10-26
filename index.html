@@ -42,7 +42,7 @@
             padding: 10px;
             border-radius: 10px;
             max-width: 320px;
-            margin: 0 auto 20px auto;
+            margin: 0 auto 15px auto;
             border: 1px solid #333;
         }
         .ip-container label {
@@ -81,13 +81,19 @@
             background-color: #00adb5;
             transform: scale(0.98);
         }
+        .btn-connect {
+            background-color: #f0ad4e;
+            color: #121212;
+            font-size: 15px;
+            padding: 10px;
+        }
         .btn-wallpaper {
             background-color: #0275d8;
             color: #ffffff;
         }
         .btn-voice {
-            background-color: #f0ad4e;
-            color: #121212;
+            background-color: #ff9800;
+            color: #ffffff;
         }
         .btn-danger {
             background-color: #d9534f;
@@ -112,6 +118,8 @@
         <div class="ip-container">
             <label for="ipAddress">عنوان IP الخاص بالشاشة:</label>
             <input type="text" id="ipAddress" class="ip-input" value="192.168.1.101" onchange="saveIP(this.value)">
+            <!-- زر ربط سريع يفتح قناة اتصال مباشرة مع الشاشة -->
+            <button class="btn btn-connect" onclick="testConnection()" style="margin-top:10px; width:100%;">🔗 ربط وتفعيل الشاشة</button>
         </div>
     </div>
 
@@ -145,13 +153,20 @@
             document.getElementById('status').innerText = '✅ تم حفظ عنوان الـ IP الجديد';
         }
 
+        // دالة لفتح صفحة الاتصال مباشرة وتجاوز حظر المتصفح الآمن
+        function testConnection() {
+            const ip = getIP();
+            const url = 'http://' + ip + ':5555/home';
+            document.getElementById('status').innerText = '🌐 جاري فتح قناة الاتصال بالشاشة...';
+            window.open(url, '_blank');
+        }
+
         function sendCommand(cmd) {
             const ip = getIP();
             const url = 'http://' + ip + ':5555/' + cmd;
             
             document.getElementById('status').innerText = '⏳ جاري إرسال الأمر...';
 
-            // استخدام عنصر صورة خفي لتجاوز حظر المتصفح للطلبات المحلية
             const img = new Image();
             img.src = url + '?t=' + new Date().getTime();
             
@@ -159,7 +174,6 @@
                 document.getElementById('status').innerText = '✅ تم إرسال الأمر بنجاح!';
             };
             
-            // احتياطي عبر نافذة مخفية إذا لم تستجب الصورة
             setTimeout(() => {
                 document.getElementById('status').innerText = '✅ تم التنفيذ';
             }, 500);
