@@ -118,8 +118,7 @@
         <div class="ip-container">
             <label for="ipAddress">عنوان IP الخاص بالشاشة:</label>
             <input type="text" id="ipAddress" class="ip-input" value="192.168.1.101" onchange="saveIP(this.value)">
-            <!-- زر ربط سريع يفتح قناة اتصال مباشرة مع الشاشة -->
-            <button class="btn btn-connect" onclick="testConnection()" style="margin-top:10px; width:100%;">🔗 ربط وتفعيل الشاشة</button>
+            <button class="btn btn-connect" onclick="connectTV()" style="margin-top:10px; width:100%;">🔗 اتصال وتفعيل الشاشة</button>
         </div>
     </div>
 
@@ -153,17 +152,17 @@
             document.getElementById('status').innerText = '✅ تم حفظ عنوان الـ IP الجديد';
         }
 
-        // دالة لفتح صفحة الاتصال مباشرة وتجاوز حظر المتصفح الآمن
-        function testConnection() {
+        // دالة الاتصال المباشر باستخدام المنفذ الصحيح 8888 والرابط الفعلي للشاشة
+        function connectTV() {
             const ip = getIP();
-            const url = 'http://' + ip + ':5555/home';
-            document.getElementById('status').innerText = '🌐 جاري فتح قناة الاتصال بالشاشة...';
+            const url = 'http://phapp.tv.selenview.com/download?action=connect&ip=' + ip + '&port=8888&web_port=44445&account_id=&mac=14:2a:14:45:fa:60&ctime=1793008706&csign=';
+            document.getElementById('status').innerText = '🌐 جاري ربط التطبيق بالشاشة...';
             window.open(url, '_blank');
         }
 
         function sendCommand(cmd) {
             const ip = getIP();
-            const url = 'http://' + ip + ':5555/' + cmd;
+            const url = 'http://' + ip + ':8888/' + cmd;
             
             document.getElementById('status').innerText = '⏳ جاري إرسال الأمر...';
 
@@ -214,7 +213,7 @@
                 formData.append('wallpaper', file);
 
                 const ip = getIP();
-                fetch('http://' + ip + ':5555/set_wallpaper', {
+                fetch('http://' + ip + ':8888/set_wallpaper', {
                     method: 'POST',
                     body: formData,
                     mode: 'no-cors'
