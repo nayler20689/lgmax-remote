@@ -152,7 +152,6 @@
             document.getElementById('status').innerText = '✅ تم حفظ عنوان الـ IP الجديد';
         }
 
-        // دالة الاتصال المباشر باستخدام المنفذ الصحيح 8888 والرابط الفعلي للشاشة
         function connectTV() {
             const ip = getIP();
             const url = 'http://phapp.tv.selenview.com/download?action=connect&ip=' + ip + '&port=8888&web_port=44445&account_id=&mac=14:2a:14:45:fa:60&ctime=1793008706&csign=';
@@ -162,6 +161,7 @@
 
         function sendCommand(cmd) {
             const ip = getIP();
+            // استخدام المنفذ 8888 حصرياً لتجنب خطأ الاتصال السابق
             const url = 'http://' + ip + ':8888/' + cmd;
             
             document.getElementById('status').innerText = '⏳ جاري إرسال الأمر...';
