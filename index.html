@@ -81,16 +81,6 @@
             background-color: #00adb5;
             transform: scale(0.98);
         }
-        .btn-connect {
-            background-color: #f0ad4e;
-            color: #121212;
-            font-size: 15px;
-            padding: 10px;
-        }
-        .btn-wallpaper {
-            background-color: #0275d8;
-            color: #ffffff;
-        }
         .btn-voice {
             background-color: #ff9800;
             color: #ffffff;
@@ -102,9 +92,7 @@
             margin-top: 15px;
             color: #00adb5;
             font-size: 14px;
-        }
-        input[type="file"] {
-            display: none;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -118,7 +106,6 @@
         <div class="ip-container">
             <label for="ipAddress">عنوان IP الخاص بالشاشة:</label>
             <input type="text" id="ipAddress" class="ip-input" value="192.168.1.101" onchange="saveIP(this.value)">
-            <button class="btn btn-connect" onclick="connectTV()" style="margin-top:10px; width:100%;">🔗 اتصال وتفعيل الشاشة</button>
         </div>
     </div>
 
@@ -127,13 +114,9 @@
     <button class="btn" onclick="sendCommand('vol_up')">🔊 رفع الصوت (+)</button>
     <button class="btn" onclick="sendCommand('vol_down')">🔉 خفض الصوت (-)</button>
     <button class="btn btn-voice" onclick="startVoiceSearch()">🎤 بحث صوتي</button>
-    
-    <label for="wallpaperInput" class="btn btn-wallpaper">🖼️ تغيير خلفية الشاشة</label>
-    <input type="file" id="wallpaperInput" accept="image/*" onchange="uploadWallpaper(this)">
-
     <button class="btn btn-danger" onclick="sendCommand('uninstall')">🗑️ إدارة / حذف التطبيقات</button>
 
-    <div id="status"></div>
+    <div id="status">جاهز للإرسال</div>
 
     <script>
         window.onload = function() {
@@ -152,16 +135,9 @@
             document.getElementById('status').innerText = '✅ تم حفظ عنوان الـ IP الجديد';
         }
 
-        function connectTV() {
-            const ip = getIP();
-            const url = 'http://phapp.tv.selenview.com/download?action=connect&ip=' + ip + '&port=8888&web_port=44445&account_id=&mac=14:2a:14:45:fa:60&ctime=1793008706&csign=';
-            document.getElementById('status').innerText = '🌐 جاري ربط التطبيق بالشاشة...';
-            window.open(url, '_blank');
-        }
-
         function sendCommand(cmd) {
             const ip = getIP();
-            // استخدام المنفذ 8888 حصرياً لتجنب خطأ الاتصال السابق
+            // توجيه الأمر مباشرة إلى الشاشة عبر المنفذ 8888 الظاهر في إعدادات الشاشة
             const url = 'http://' + ip + ':8888/' + cmd;
             
             document.getElementById('status').innerText = '⏳ جاري إرسال الأمر...';
@@ -170,7 +146,7 @@
             img.src = url + '?t=' + new Date().getTime();
             
             img.onload = img.onerror = function() {
-                document.getElementById('status').innerText = '✅ تم إرسال الأمر بنجاح!';
+                document.getElementById('status').innerText = '✅ تم إرسال الأمر إلى الشاشة!';
             };
             
             setTimeout(() => {
@@ -202,29 +178,6 @@
             };
 
             recognition.start();
-        }
-
-        function uploadWallpaper(input) {
-            if (input.files && input.files[0]) {
-                const file = input.files[0];
-                document.getElementById('status').innerText = '🖼️ جاري إرسال الخلفية...';
-
-                const formData = new FormData();
-                formData.append('wallpaper', file);
-
-                const ip = getIP();
-                fetch('http://' + ip + ':8888/set_wallpaper', {
-                    method: 'POST',
-                    body: formData,
-                    mode: 'no-cors'
-                })
-                .then(() => {
-                    document.getElementById('status').innerText = '✅ تم إرسال الخلفية بنجاح!';
-                })
-                .catch(() => {
-                    document.getElementById('status').innerText = '❌ تأكد من اتصال الواي فاي والشاشة';
-                });
-            }
         }
     </script>
 </body>
